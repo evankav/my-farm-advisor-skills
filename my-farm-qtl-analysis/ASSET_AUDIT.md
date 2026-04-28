@@ -4,7 +4,7 @@ Audit date: 2026-04-28
 
 ## Scope
 
-- imported local structural base from `scientific-skills/qtl-analysis/`
+- imported local structural base from the local qtl-analysis subtree snapshot
 - remote completeness backfill from `borealBytes/my-farm-advisor@main:skills/my-farm-qtl-analysis`
 - binary/large-file review before tracking
 
