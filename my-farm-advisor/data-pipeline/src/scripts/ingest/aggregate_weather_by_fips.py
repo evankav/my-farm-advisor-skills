@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pyright: reportMissingImports=false
 """Build canonical county/FIPS weather tables for the lower 48 states."""
 
 from __future__ import annotations
@@ -16,7 +17,6 @@ import pandas as pd
 import requests
 
 _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
-_REPO_ROOT = _SCRIPTS_DIR.parents[2]
 sys.path.insert(0, str(_SCRIPTS_DIR))
 sys.path.insert(0, str(_SCRIPTS_DIR / "lib"))
 
@@ -48,8 +48,11 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def _repo_relative(path: Path) -> str:
-    return str(path.resolve().relative_to(_REPO_ROOT))
+def _runtime_relative(path: Path, runtime_base: Path) -> str:
+    try:
+        return str(path.resolve(strict=False).relative_to(runtime_base))
+    except ValueError:
+        return str(path)
 
 
 def _paths_module() -> Any:
@@ -297,8 +300,10 @@ def main() -> int:
     ensure_skill_path("maturity-by-fips")
     ensure_skill_path("nasa-power-weather")
 
-    shared_geoadmin_counties_dir = _paths_module().shared_geoadmin_counties_dir
-    shared_weather_county_table_path = _paths_module().shared_weather_county_table_path
+    paths_module = _paths_module()
+    runtime_base = paths_module.DATA_ROOT
+    shared_geoadmin_counties_dir = paths_module.shared_geoadmin_counties_dir
+    shared_weather_county_table_path = paths_module.shared_weather_county_table_path
     build_county_weather_coverage_summary = (
         _maturity_module().build_county_weather_coverage_summary
     )
@@ -397,8 +402,8 @@ def main() -> int:
                 "year": args.year,
                 "weather_source": args.weather_source,
                 "coverage": args.coverage,
-                "county_weather_path": _repo_relative(table_path),
-                "coverage_summary_path": _repo_relative(summary_path),
+                "county_weather_path": _runtime_relative(table_path, runtime_base),
+                "coverage_summary_path": _runtime_relative(summary_path, runtime_base),
                 "row_count": int(len(county_weather)),
                 "county_count_covered": int(coverage_summary["county_count_covered"]),
                 "county_count_uncovered": int(

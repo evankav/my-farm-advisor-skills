@@ -31,23 +31,26 @@ import requests
 from shapely.geometry import Polygon
 
 from naming import field_slug_from_id
-from paths import farm_boundary_path
+from paths import DATA_ROOT, SCRIPTS_ROOT, farm_boundary_path, farm_manifest_dir, shared_geoadmin_counties_dir
 
 OVERPASS_URLS = [
     "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
     "https://lz4.overpass-api.de/api/interpreter",
 ]
-REPO_ROOT = Path(__file__).resolve().parents[4]
-COUNTIES_PATH = (
-    REPO_ROOT
-    / "data"
-    / "my-farm-advisor"
-    / "shared"
-    / "geoadmin"
-    / "l2_counties"
-    / "counties_usa.geojson"
-)
+COUNTIES_PATH = shared_geoadmin_counties_dir() / "counties_usa.geojson"
+
+
+def _runtime_path(path: str | Path) -> Path:
+    candidate = Path(path)
+    return candidate if candidate.is_absolute() else DATA_ROOT / candidate
+
+
+def _runtime_relative(path: Path) -> str:
+    try:
+        return str(path.resolve(strict=False).relative_to(DATA_ROOT))
+    except ValueError:
+        return str(path)
 
 
 def _slugify(value: str) -> str:
@@ -66,11 +69,11 @@ def _ensure_counties_layer() -> None:
         return
     cmd = [
         sys.executable,
-        "data/my-farm-advisor/scripts/ingest/download_geoadmin.py",
+        str(SCRIPTS_ROOT / "ingest" / "download_geoadmin.py"),
         "--levels",
         "l2_counties",
     ]
-    subprocess.run(cmd, cwd=str(REPO_ROOT), check=True)
+    subprocess.run(cmd, cwd=str(DATA_ROOT), check=True)
 
 
 def _load_target_county(state_fips: str, county_name: str) -> gpd.GeoDataFrame:
@@ -250,9 +253,9 @@ def _merge_with_existing(
 def _run_farm_pipeline(args, boundary_path: Path, inventory_path: Path) -> None:
     cmd = [
         sys.executable,
-        "data/my-farm-advisor/scripts/run_farm_pipeline.py",
+        str(SCRIPTS_ROOT / "run_farm_pipeline.py"),
         "--boundaries",
-        str(boundary_path.relative_to(REPO_ROOT)),
+        str(boundary_path),
         "--grower-slug",
         args.grower_slug,
         "--farm-slug",
@@ -260,11 +263,11 @@ def _run_farm_pipeline(args, boundary_path: Path, inventory_path: Path) -> None:
         "--farm-name",
         args.farm_name,
         "--inventory-csv",
-        str(inventory_path.relative_to(REPO_ROOT)),
+        str(inventory_path),
     ]
     if args.force:
         cmd.append("--force")
-    subprocess.run(cmd, cwd=str(REPO_ROOT), check=True)
+    subprocess.run(cmd, cwd=str(DATA_ROOT), check=True)
 
 
 def main() -> None:
@@ -288,7 +291,7 @@ def main() -> None:
         default=None,
         help=(
             "Inventory output path. Defaults to "
-            "data/my-farm-advisor/growers/<grower>/farms/<farm>/manifests/field-inventory.csv"
+            "growers/<grower>/farms/<farm>/manifests/field-inventory.csv under the runtime root"
         ),
     )
     parser.add_argument(
@@ -324,27 +327,17 @@ def main() -> None:
         raise RuntimeError("No eligible farmland polygons found for requested county")
 
     default_inventory = (
-        REPO_ROOT
-        / "data"
-        / "my-farm-advisor"
-        / "growers"
-        / args.grower_slug
-        / "farms"
-        / args.farm_slug
-        / "manifests"
-        / "field-inventory.csv"
+        farm_manifest_dir(args.grower_slug, args.farm_slug) / "field-inventory.csv"
     )
     inventory_path = Path(args.inventory_csv) if args.inventory_csv else default_inventory
-    inventory_path = (
-        inventory_path if inventory_path.is_absolute() else (REPO_ROOT / inventory_path)
-    )
+    inventory_path = inventory_path if inventory_path.is_absolute() else _runtime_path(inventory_path)
 
     boundary_out = (
         Path(args.boundary_out)
         if args.boundary_out
         else farm_boundary_path(args.grower_slug, args.farm_slug)
     )
-    boundary_out = boundary_out if boundary_out.is_absolute() else (REPO_ROOT / boundary_out)
+    boundary_out = boundary_out if boundary_out.is_absolute() else _runtime_path(boundary_out)
     boundary_out.parent.mkdir(parents=True, exist_ok=True)
 
     final_fields = sampled
@@ -370,8 +363,8 @@ def main() -> None:
         "sample_count": len(sampled),
         "final_field_count": len(final_fields),
         "seed": args.seed,
-        "boundary_path": str(boundary_out.relative_to(REPO_ROOT)),
-        "inventory_csv": str(inventory_path.relative_to(REPO_ROOT)),
+        "boundary_path": _runtime_relative(boundary_out),
+        "inventory_csv": _runtime_relative(inventory_path),
         "append": bool(args.append),
     }
     print(json.dumps(summary, indent=2))

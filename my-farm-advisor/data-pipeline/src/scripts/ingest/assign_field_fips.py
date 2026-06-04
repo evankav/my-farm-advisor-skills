@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pyright: reportMissingImports=false
 """Assign demo farm fields to county FIPS using canonical geoadmin assets."""
 
 from __future__ import annotations
@@ -12,13 +13,15 @@ from pathlib import Path
 import geopandas as gpd
 
 _SCRIPTS_DIR = Path(__file__).resolve().parent.parent
-_REPO_ROOT = _SCRIPTS_DIR.parents[2]
 sys.path.insert(0, str(_SCRIPTS_DIR))
 sys.path.insert(0, str(_SCRIPTS_DIR / "lib"))
 
 
-def _repo_relative(path: Path) -> str:
-    return str(path.resolve().relative_to(_REPO_ROOT))
+def _runtime_relative(path: Path, runtime_base: Path) -> str:
+    try:
+        return str(path.resolve(strict=False).relative_to(runtime_base))
+    except ValueError:
+        return str(path)
 
 
 def parse_args() -> argparse.Namespace:
@@ -28,9 +31,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--inventory-path",
         type=Path,
-        default=Path(
-            "data/my-farm-advisor/growers/iowa-demo-grower/farms/iowa-demo-farm/manifests/field-inventory.csv"
-        ),
+        default=None,
         help="Optional inventory CSV used to map field IDs to canonical field slugs",
     )
     return parser.parse_args()
@@ -38,7 +39,9 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     from paths import (
+        DATA_ROOT,
         farm_boundary_path,
+        farm_manifest_dir,
         farm_summary_path,
         farm_table_path,
         shared_geoadmin_counties_dir,
@@ -51,16 +54,22 @@ def main() -> int:
 
     ensure_skill_path("geoadmin-admin")
     args = parse_args()
+    inventory_path = (
+        args.inventory_path
+        if args.inventory_path is not None
+        else farm_manifest_dir(args.grower_slug, args.farm_slug) / "field-inventory.csv"
+    )
+    inventory_path = inventory_path if inventory_path.is_absolute() else DATA_ROOT / inventory_path
     ensure_canonical_data_tree(
         grower_slug=args.grower_slug,
         farm_slug=args.farm_slug,
-        inventory_path=args.inventory_path if args.inventory_path.exists() else None,
+        inventory_path=inventory_path if inventory_path.exists() else None,
     )
     geoadmin_admin = importlib.import_module("geoadmin_admin")
     fields = gpd.read_file(farm_boundary_path(args.grower_slug, args.farm_slug))
     counties = gpd.read_file(shared_geoadmin_counties_dir() / "counties_usa.geojson")
     field_slug_map = field_slug_map_from_inventory(
-        args.inventory_path if args.inventory_path.exists() else None
+        inventory_path if inventory_path.exists() else None
     )
     mapping_df, ambiguity_df = geoadmin_admin.assign_fields_to_counties(
         fields, counties, field_slug_map=field_slug_map
@@ -86,8 +95,8 @@ def main() -> int:
                 "farm_slug": args.farm_slug,
                 "field_count": int(len(mapping_df)),
                 "ambiguity_count": int(len(ambiguity_df)),
-                "mapping_path": _repo_relative(mapping_path),
-                "ambiguity_path": _repo_relative(ambiguity_path),
+                "mapping_path": _runtime_relative(mapping_path, DATA_ROOT),
+                "ambiguity_path": _runtime_relative(ambiguity_path, DATA_ROOT),
             },
             indent=2,
         )
