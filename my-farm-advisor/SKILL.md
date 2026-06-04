@@ -28,14 +28,14 @@ Use My Farm Advisor as the umbrella skill for agricultural data-science and farm
 
 Open the subtree index that matches the request:
 
-- [Admin](INDEX.md#admin) via [admin/INDEX.md](admin/INDEX.md)
-- [Data Sources](INDEX.md#data-sources) via [data-sources/INDEX.md](data-sources/INDEX.md)
-- [EDA](INDEX.md#eda) via [eda/INDEX.md](eda/INDEX.md)
-- [Field Management](INDEX.md#field-management) via [field-management/INDEX.md](field-management/INDEX.md)
-- [Imagery](INDEX.md#imagery) via [imagery/INDEX.md](imagery/INDEX.md)
-- [Soil](INDEX.md#soil) via [soil/INDEX.md](soil/INDEX.md)
-- [Strategy](INDEX.md#strategy) via [strategy/INDEX.md](strategy/INDEX.md)
-- [Weather](INDEX.md#weather) via [weather/INDEX.md](weather/INDEX.md)
+- [Admin](admin/INDEX.md)
+- [Data Sources](data-sources/INDEX.md)
+- [EDA](eda/INDEX.md)
+- [Field Management](field-management/INDEX.md)
+- [Imagery](imagery/INDEX.md)
+- [Soil](soil/INDEX.md)
+- [Strategy](strategy/INDEX.md)
+- [Weather](weather/INDEX.md)
 
 ## Routing Guidance
 
@@ -50,8 +50,8 @@ Open the subtree index that matches the request:
 
 ## Runtime Notes
 
-This umbrella skill contains large supporting assets and examples. The nested documents are no longer separate discoverable skills; instead, use the subtree indexes and linked guides and AGENTS.md files for progressive discovery.
+This umbrella skill contains large supporting assets and examples. The nested farm workflows are document-routed workflows, not separate runtime-discoverable skills. Use the subtree indexes and linked guides and AGENTS.md files for progressive discovery.
 
 ## Data Notes
 
-This skill suite includes large data files (satellite imagery, shapefiles, reports) tracked with Git LFS. Pull LFS files before running data-heavy workflows.
+Some workflows require LFS-backed or runtime-downloaded assets. Keep generated outputs outside the repository and pull any required LFS assets before running data-heavy workflows.
