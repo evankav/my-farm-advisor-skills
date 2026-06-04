@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pyright: reportMissingImports=false
 """Render static county maturity maps from canonical corn and soybean tables."""
 
 from __future__ import annotations

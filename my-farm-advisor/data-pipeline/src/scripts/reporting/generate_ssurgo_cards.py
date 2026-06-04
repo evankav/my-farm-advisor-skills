@@ -16,27 +16,22 @@ import pandas as pd
 
 matplotlib.use("Agg")
 
-_REPO = Path(__file__).resolve().parents[4]
-_SCRIPTS = _REPO / "data" / "my-farm-advisor" / "scripts"
-_LIB = _REPO / "data" / "my-farm-advisor" / "scripts" / "lib"
+_LOCAL_LIB = Path(__file__).resolve().parents[1] / "lib"
+sys.path.insert(0, str(_LOCAL_LIB))
 
+from runtime_paths import resolve_runtime_paths  # noqa: E402
 
-def _ensure_skill_path(skill_name: str) -> Path:
-    matches = sorted(
-        (_REPO / "skills" / "my-farm-advisor").glob(f"**/{skill_name}/src")
-    )
-    if not matches:
-        raise FileNotFoundError(f"Skill source path not found for '{skill_name}'")
-    skill_path = matches[0]
-    skill_path_str = str(skill_path)
-    if skill_path_str not in sys.path:
-        sys.path.insert(0, skill_path_str)
-    return skill_path
-
-
-_ensure_skill_path("farm-intelligence-reporting")
+_RUNTIME_PATHS = resolve_runtime_paths()
+_REPO = _RUNTIME_PATHS.runtime_base
+_SCRIPTS = _RUNTIME_PATHS.runtime_scripts
+_LIB = _RUNTIME_PATHS.runtime_scripts / "lib"
 sys.path.insert(0, str(_SCRIPTS))
 sys.path.insert(0, str(_LIB))
+
+from reporting_bootstrap import ensure_skill_path  # noqa: E402
+
+
+ensure_skill_path("farm-intelligence-reporting")
 
 from paths import (
     farm_boundary_path,

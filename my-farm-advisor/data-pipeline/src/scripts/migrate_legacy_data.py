@@ -5,15 +5,25 @@ import argparse
 import shutil
 from pathlib import Path
 
-_REPO = Path(__file__).resolve().parents[3]
-_DATA = _REPO / "data"
+from lib.paths import (
+    DATA_ROOT,
+    farm_boundary_path,
+    farm_tables_dir,
+    field_soil_polygon_path,
+    shared_cdl_tables_dir,
+)
+
+_CHECKOUT_SKILL_ROOT = Path(__file__).resolve().parents[3]
+_LEGACY_DATA_ROOT = _CHECKOUT_SKILL_ROOT / "data"
+_DEFAULT_GROWER = "iowa-demo-grower"
+_DEFAULT_FARM = "iowa-demo-farm"
 
 _LEGACY_ROOTS = {
-    "cdl": _DATA / "cdl",
-    "eda": _DATA / "EDA",
-    "field_boundaries": _DATA / "field-boundaries",
-    "soil": _DATA / "soil",
-    "weather": _DATA / "weather",
+    "cdl": _LEGACY_DATA_ROOT / "cdl",
+    "eda": _LEGACY_DATA_ROOT / "EDA",
+    "field_boundaries": _LEGACY_DATA_ROOT / "field-boundaries",
+    "soil": _LEGACY_DATA_ROOT / "soil",
+    "weather": _LEGACY_DATA_ROOT / "weather",
 }
 
 
@@ -58,20 +68,12 @@ def migrate(delete_legacy: bool = False) -> None:
     print("=" * 60)
 
     cdl_copied, cdl_existing = _copy_tree(
-        _LEGACY_ROOTS["cdl"], _DATA / "shared" / "cdl" / "derived" / "tables"
+        _LEGACY_ROOTS["cdl"], shared_cdl_tables_dir()
     )
     print(f"CDL backfill: copied={cdl_copied} existing={cdl_existing}")
 
     boundary_source = _LEGACY_ROOTS["field_boundaries"] / "iowa_10_fields.geojson"
-    boundary_target = (
-        _DATA
-        / "growers"
-        / "iowa-demo-grower"
-        / "farms"
-        / "iowa-demo-farm"
-        / "boundary"
-        / "field_boundaries.geojson"
-    )
+    boundary_target = farm_boundary_path(_DEFAULT_GROWER, _DEFAULT_FARM)
     if boundary_source.exists():
         status = _copy_if_missing(boundary_source, boundary_target)
         print(f"Boundary backfill: {status} -> {boundary_target}")
@@ -80,13 +82,7 @@ def migrate(delete_legacy: bool = False) -> None:
 
     soil_copied, soil_existing = _copy_tree(
         _LEGACY_ROOTS["soil"],
-        _DATA
-        / "growers"
-        / "iowa-demo-grower"
-        / "farms"
-        / "iowa-demo-farm"
-        / "derived"
-        / "tables",
+        farm_tables_dir(_DEFAULT_GROWER, _DEFAULT_FARM),
     )
     print(f"Soil table backfill: copied={soil_copied} existing={soil_existing}")
 
@@ -98,17 +94,7 @@ def migrate(delete_legacy: bool = False) -> None:
             field_slug = _field_slug_from_cache_name(source.name)
             if field_slug is None:
                 continue
-            target = (
-                _DATA
-                / "growers"
-                / "iowa-demo-grower"
-                / "farms"
-                / "iowa-demo-farm"
-                / "fields"
-                / field_slug
-                / "soil"
-                / "ssurgo_soil_types.geojson"
-            )
+            target = field_soil_polygon_path(_DEFAULT_GROWER, _DEFAULT_FARM, field_slug)
             status = _copy_if_missing(source, target)
             if status == "copied":
                 cache_copied += 1
@@ -118,18 +104,12 @@ def migrate(delete_legacy: bool = False) -> None:
 
     weather_copied, weather_existing = _copy_tree(
         _LEGACY_ROOTS["weather"],
-        _DATA
-        / "growers"
-        / "iowa-demo-grower"
-        / "farms"
-        / "iowa-demo-farm"
-        / "derived"
-        / "tables",
+        farm_tables_dir(_DEFAULT_GROWER, _DEFAULT_FARM),
     )
     print(f"Weather backfill: copied={weather_copied} existing={weather_existing}")
 
     eda_copied, eda_existing = _copy_tree(
-        _LEGACY_ROOTS["eda"], _DATA / "reporting" / "legacy-backfill" / "EDA"
+        _LEGACY_ROOTS["eda"], DATA_ROOT / "reporting" / "legacy-backfill" / "EDA"
     )
     print(f"EDA artifact backfill: copied={eda_copied} existing={eda_existing}")
 

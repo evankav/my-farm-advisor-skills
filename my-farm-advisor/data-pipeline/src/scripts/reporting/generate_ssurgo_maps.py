@@ -24,9 +24,15 @@ from shapely import wkt
 
 matplotlib.use("Agg")
 
-_REPO = Path(__file__).resolve().parents[4]
-_SCRIPTS = _REPO / "data" / "my-farm-advisor" / "scripts"
-_LIB = _REPO / "data" / "my-farm-advisor" / "scripts" / "lib"
+_LOCAL_LIB = Path(__file__).resolve().parents[1] / "lib"
+sys.path.insert(0, str(_LOCAL_LIB))
+
+from runtime_paths import resolve_runtime_paths  # noqa: E402
+
+_RUNTIME_PATHS = resolve_runtime_paths()
+_REPO = _RUNTIME_PATHS.runtime_base
+_SCRIPTS = _RUNTIME_PATHS.runtime_scripts
+_LIB = _RUNTIME_PATHS.runtime_scripts / "lib"
 sys.path.insert(0, str(_SCRIPTS))
 sys.path.insert(0, str(_LIB))
 
