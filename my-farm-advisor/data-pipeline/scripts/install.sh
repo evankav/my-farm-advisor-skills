@@ -4,8 +4,8 @@ set -euo pipefail
 THIS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_ROOT="$(cd "${THIS_DIR}/.." && pwd)"
 
-if [[ -n "${R2_SEED_DATA_ROOT:-}" ]]; then
-  DATA_ROOT="${R2_SEED_DATA_ROOT}"
+if [[ -n "${DATA_PIPELINE_DATA_ROOT:-}" ]]; then
+  DATA_ROOT="${DATA_PIPELINE_DATA_ROOT}"
 elif [[ -d "/data/workspace/data/my-farm-advisor" ]]; then
   DATA_ROOT="/data/workspace/data/my-farm-advisor"
 else
@@ -13,14 +13,14 @@ else
 fi
 
 if [[ -z "${DATA_ROOT}" || ! -d "${DATA_ROOT}" ]]; then
-  echo "[install] Unable to locate data root. Set R2_SEED_DATA_ROOT to the data directory." >&2
+  echo "[install] Unable to locate data root. Set DATA_PIPELINE_DATA_ROOT to the data directory." >&2
   exit 1
 fi
 
-TARGET_ROOT="${DATA_ROOT}/r2-seed-pipeline"
+TARGET_ROOT="${DATA_ROOT}/data-pipeline"
 mkdir -p "${TARGET_ROOT}"
 
-VENV_DIR="${R2_SEED_VENV_DIR:-${TARGET_ROOT}/.venv}"
+VENV_DIR="${DATA_PIPELINE_VENV_DIR:-${TARGET_ROOT}/.venv}"
 
 echo "[install] Data root: ${DATA_ROOT}"
 echo "[install] Pipeline root: ${TARGET_ROOT}"

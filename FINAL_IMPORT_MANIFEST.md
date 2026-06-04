@@ -17,7 +17,7 @@ Repository: `my-farm-advisor-skills`
 
 - `.git/`
 - Generated geoadmin runtime payloads including `countries.geojson`, `states_usa.geojson`, and runtime copies under `data/my-farm-advisor/shared/geoadmin/{l0_countries,l1_states,l2_counties}/`
-- Generated maturity report and table artifacts under `r2-seed-pipeline/src/shared/*/{reports,tables}/`
+- Generated maturity report and table artifacts under `data-pipeline/src/shared/*/{reports,tables}/`
 - Repo-local CI or deployment files outside `skills/my-farm-advisor/`
 
 ### `my-farm-breeding-trial-management`

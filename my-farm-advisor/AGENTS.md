@@ -16,7 +16,7 @@ Always read `SKILL.md` first for routing, then `README.md` for the overview. Rea
 
 - Use this skill for farm advisory routing, farm data rebuilds, field management, imagery, soil, weather, EDA, strategy, and admin map workflows.
 - Route through `INDEX.md` into `admin/`, `data-sources/`, `eda/`, `field-management/`, `imagery/`, `soil/`, `strategy/`, or `weather/`.
-- Treat `r2-seed-pipeline/` as deterministic pipeline code and docs. Preserve runtime data root behavior and generated asset exclusions.
+- Treat `data-pipeline/` as deterministic pipeline code and docs. Preserve runtime data root behavior and generated asset exclusions.
 - For geoadmin work, preserve committed metadata and downloader scripts, but keep generated payloads out of Git per `../AGENTS.md`.
 
 ## Local validation

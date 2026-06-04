@@ -1,15 +1,15 @@
-# R2 Seed Pipeline Runtime Setup
+# Data Pipeline Runtime Setup
 
-This subskill ships the scripts that build the seed-pipeline reports and
+This subskill ships the scripts that build the data-pipeline reports and
 posters. Each runtime host creates its own virtualenv inside the data tree on
 first run; the scripts auto-bootstrap that environment before continuing.
 
 ## Quick start
 
 ```bash
-cd skills/my-farm-advisor/r2-seed-pipeline
+cd skills/my-farm-advisor/data-pipeline
 ./scripts/install.sh               # optional preinstall; first script run also bootstraps automatically
-source /data/workspace/data/my-farm-advisor/r2-seed-pipeline/.venv/bin/activate
+source /data/workspace/data/my-farm-advisor/data-pipeline/.venv/bin/activate
 python src/scripts/run_farm_pipeline.py \
   --grower-slug il-champaign-grower \
   --farm-slug champaign-demo-farm \
@@ -18,12 +18,12 @@ python src/scripts/run_farm_pipeline.py \
 
 `install.sh` looks for a writable data root in this order:
 
-1. `R2_SEED_DATA_ROOT` (explicit override)
+1. `DATA_PIPELINE_DATA_ROOT` (explicit override)
 2. `/data/workspace/data/my-farm-advisor` (OpenClaw default)
 3. `../../../../data/my-farm-advisor` relative to the skill (local checkout)
 
 A matching `.venv/` directory is created under
-`${DATA_ROOT}/r2-seed-pipeline/.venv` and populated with the dependencies from
+`${DATA_ROOT}/data-pipeline/.venv` and populated with the dependencies from
 `requirements.txt`.
 
 ## Running inside OpenClaw CLI
@@ -33,7 +33,7 @@ activate the environment explicitly, but the entrypoints will install and re-exe
 themselves if the runtime venv is missing.
 
 ```bash
-bash -lc 'cd /data/workspace/data/my-farm-advisor/r2-seed-pipeline && \
+bash -lc 'cd /data/workspace/data/my-farm-advisor/data-pipeline && \
   source .venv/bin/activate && \
   python src/scripts/run_farm_pipeline.py --grower-slug ... --farm-slug ...'
 ```

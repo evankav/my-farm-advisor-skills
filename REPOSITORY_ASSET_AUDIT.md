@@ -47,7 +47,7 @@ No currently tracked files required Git LFS action.
 
 - `git check-ignore -v countries.geojson states_usa.geojson` resolves to `.gitignore` lines `14-15`
 - `./scripts/validate.sh` passed the tracked-asset checks for both forbidden geoadmin payload names
-- repository still retains structured geoadmin metadata under `my-farm-advisor/r2-seed-pipeline/src/shared/geoadmin/` without tracking generated payload dumps
+- repository still retains structured geoadmin metadata under `my-farm-advisor/data-pipeline/src/shared/geoadmin/` without tracking generated payload dumps
 
 Outcome: geoadmin payload exclusions are working as intended.
 

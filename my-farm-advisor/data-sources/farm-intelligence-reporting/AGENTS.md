@@ -10,7 +10,7 @@ Edits should stay in this folder and its children unless the user explicitly ask
 
 ## Read nearby docs first
 
-Read `../INDEX.md` first, then `../../README.md` and `../../SKILL.md` for routing context. Reporting scripts live under `../../r2-seed-pipeline/src/scripts/reporting/`.
+Read `../INDEX.md` first, then `../../README.md` and `../../SKILL.md` for routing context. Reporting scripts live under `../../data-pipeline/src/scripts/reporting/`.
 
 ## Local workflow notes
 
@@ -22,7 +22,7 @@ Read `../INDEX.md` first, then `../../README.md` and `../../SKILL.md` for routin
 
 ## Local validation
 
-When runtime scripts are available, run the narrow reporting command from `../../r2-seed-pipeline/src/scripts/reporting/` against a small demo farm. Otherwise run `./scripts/validate.sh` from the repository root after structural changes.
+When runtime scripts are available, run the narrow reporting command from `../../data-pipeline/src/scripts/reporting/` against a small demo farm. Otherwise run `./scripts/validate.sh` from the repository root after structural changes.
 
 ## Local-delta-only reminder
 

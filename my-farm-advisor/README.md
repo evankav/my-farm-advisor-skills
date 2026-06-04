@@ -118,22 +118,22 @@ flowchart LR
 
 High-value pipeline and bootstrap entrypoints include:
 
-- full farm pipeline runner: [`r2-seed-pipeline/src/scripts/run_farm_pipeline.py`](r2-seed-pipeline/src/scripts/run_farm_pipeline.py)
-- runtime bootstrap: [`r2-seed-pipeline/src/scripts/bootstrap_runtime.py`](r2-seed-pipeline/src/scripts/bootstrap_runtime.py)
-- county bootstrap: [`r2-seed-pipeline/src/scripts/ingest/bootstrap_farm_from_county.py`](r2-seed-pipeline/src/scripts/ingest/bootstrap_farm_from_county.py)
-- field download: [`r2-seed-pipeline/src/scripts/ingest/download_fields.py`](r2-seed-pipeline/src/scripts/ingest/download_fields.py)
-- weather download: [`r2-seed-pipeline/src/scripts/ingest/download_weather.py`](r2-seed-pipeline/src/scripts/ingest/download_weather.py)
-- soil download: [`r2-seed-pipeline/src/scripts/ingest/download_soil.py`](r2-seed-pipeline/src/scripts/ingest/download_soil.py)
-- satellite download: [`r2-seed-pipeline/src/scripts/ingest/download_satellite_imagery.py`](r2-seed-pipeline/src/scripts/ingest/download_satellite_imagery.py)
-- reporting bootstrap: [`r2-seed-pipeline/src/scripts/reporting_bootstrap.py`](r2-seed-pipeline/src/scripts/reporting_bootstrap.py)
-- farm markdown/html outputs: [`r2-seed-pipeline/src/scripts/reporting/generate_farm_markdown.py`](r2-seed-pipeline/src/scripts/reporting/generate_farm_markdown.py), [`r2-seed-pipeline/src/scripts/reporting/generate_farm_html.py`](r2-seed-pipeline/src/scripts/reporting/generate_farm_html.py)
-- field posters: [`r2-seed-pipeline/src/scripts/reporting/generate_field_posters.py`](r2-seed-pipeline/src/scripts/reporting/generate_field_posters.py)
+- full farm pipeline runner: [`data-pipeline/src/scripts/run_farm_pipeline.py`](data-pipeline/src/scripts/run_farm_pipeline.py)
+- runtime bootstrap: [`data-pipeline/src/scripts/bootstrap_runtime.py`](data-pipeline/src/scripts/bootstrap_runtime.py)
+- county bootstrap: [`data-pipeline/src/scripts/ingest/bootstrap_farm_from_county.py`](data-pipeline/src/scripts/ingest/bootstrap_farm_from_county.py)
+- field download: [`data-pipeline/src/scripts/ingest/download_fields.py`](data-pipeline/src/scripts/ingest/download_fields.py)
+- weather download: [`data-pipeline/src/scripts/ingest/download_weather.py`](data-pipeline/src/scripts/ingest/download_weather.py)
+- soil download: [`data-pipeline/src/scripts/ingest/download_soil.py`](data-pipeline/src/scripts/ingest/download_soil.py)
+- satellite download: [`data-pipeline/src/scripts/ingest/download_satellite_imagery.py`](data-pipeline/src/scripts/ingest/download_satellite_imagery.py)
+- reporting bootstrap: [`data-pipeline/src/scripts/reporting_bootstrap.py`](data-pipeline/src/scripts/reporting_bootstrap.py)
+- farm markdown/html outputs: [`data-pipeline/src/scripts/reporting/generate_farm_markdown.py`](data-pipeline/src/scripts/reporting/generate_farm_markdown.py), [`data-pipeline/src/scripts/reporting/generate_farm_html.py`](data-pipeline/src/scripts/reporting/generate_farm_html.py)
+- field posters: [`data-pipeline/src/scripts/reporting/generate_field_posters.py`](data-pipeline/src/scripts/reporting/generate_field_posters.py)
 
 The most important high-level orchestration docs are:
 
 - deterministic rebuild contract: [`data-sources/farm-data-rebuild/AGENTS.md`](data-sources/farm-data-rebuild/AGENTS.md)
 - farm reporting pipeline: [`data-sources/farm-intelligence-reporting/AGENTS.md`](data-sources/farm-intelligence-reporting/AGENTS.md)
-- runtime seed/bootstrap behavior: [`r2-seed-pipeline/AGENTS.md`](r2-seed-pipeline/AGENTS.md)
+- runtime data-pipeline bootstrap behavior: [`data-pipeline/AGENTS.md`](data-pipeline/AGENTS.md)
 
 ## Shared Resources
 
@@ -141,14 +141,14 @@ The farm tree includes a `shared/` layer for reusable datasets that are not spec
 
 Examples already included in the skill tree:
 
-- geoadmin layers under [`r2-seed-pipeline/src/shared/geoadmin/`](r2-seed-pipeline/src/shared/geoadmin)
-- corn maturity baselines under [`r2-seed-pipeline/src/shared/corn_maturity/`](r2-seed-pipeline/src/shared/corn_maturity)
-- soybean maturity baselines under [`r2-seed-pipeline/src/shared/soybean_maturity/`](r2-seed-pipeline/src/shared/soybean_maturity)
-- shared manifest examples under [`r2-seed-pipeline/src/shared/manifests/`](r2-seed-pipeline/src/shared/manifests)
+- geoadmin layers under [`data-pipeline/src/shared/geoadmin/`](data-pipeline/src/shared/geoadmin)
+- corn maturity baselines under [`data-pipeline/src/shared/corn_maturity/`](data-pipeline/src/shared/corn_maturity)
+- soybean maturity baselines under [`data-pipeline/src/shared/soybean_maturity/`](data-pipeline/src/shared/soybean_maturity)
+- shared manifest examples under [`data-pipeline/src/shared/manifests/`](data-pipeline/src/shared/manifests)
 
 These shared resources support deterministic rebuilds and reporting without forcing every grower or farm to duplicate the same baseline datasets.
 
-Geoadmin payloads are handled a little differently from most small reference files: the committed items under `r2-seed-pipeline/src/shared/geoadmin/` are metadata records plus downloader code, while the generated GeoJSON/Parquet payloads are rebuilt at runtime under `data/my-farm-advisor/shared/geoadmin/{l0_countries,l1_states,l2_counties}/`. See [`docs/GEODATA.md`](docs/GEODATA.md) for the metadata locations, source URL conventions, runtime destinations, and downloader commands.
+Geoadmin payloads are handled a little differently from most small reference files: the committed items under `data-pipeline/src/shared/geoadmin/` are metadata records plus downloader code, while the generated GeoJSON/Parquet payloads are rebuilt at runtime under `data/my-farm-advisor/shared/geoadmin/{l0_countries,l1_states,l2_counties}/`. See [`docs/GEODATA.md`](docs/GEODATA.md) for the metadata locations, source URL conventions, runtime destinations, and downloader commands.
 
 ## Storage Modes
 
@@ -174,11 +174,11 @@ The shipped pipeline/runtime docs explicitly support:
 
 - local checkout mode: `data/my-farm-advisor/`
 - volume-backed runtime mode: `/data/workspace/data/my-farm-advisor/`
-- object-storage-backed sync paths such as S3 or R2, with `rsync --no-times` semantics documented for those mounts in [`r2-seed-pipeline/AGENTS.md`](r2-seed-pipeline/AGENTS.md)
+- object-storage-backed sync paths such as S3 or R2, with `rsync --no-times` semantics documented for those mounts in [`data-pipeline/AGENTS.md`](data-pipeline/AGENTS.md)
 
-The runtime installer in [`r2-seed-pipeline/README.md`](r2-seed-pipeline/README.md) resolves the writable data root in this order:
+The runtime installer in [`data-pipeline/README.md`](data-pipeline/README.md) resolves the writable data root in this order:
 
-1. `R2_SEED_DATA_ROOT`
+1. `DATA_PIPELINE_DATA_ROOT`
 2. `/data/workspace/data/my-farm-advisor`
 3. local checkout-relative `data/my-farm-advisor`
 
@@ -225,7 +225,7 @@ The umbrella entrypoint is [`SKILL.md`](SKILL.md). From there, the skill routes 
 | Area             | What it covers                                                         | Start here                                               |
 | ---------------- | ---------------------------------------------------------------------- | -------------------------------------------------------- |
 | Admin            | Geospatial administration and interactive map workflows                | [`admin/INDEX.md`](admin/INDEX.md)                       |
-| Data Sources     | Canonical rebuilds, seed pipelines, and farm intelligence reporting    | [`data-sources/INDEX.md`](data-sources/INDEX.md)         |
+| Data Sources     | Canonical rebuilds, data pipelines, and farm intelligence reporting    | [`data-sources/INDEX.md`](data-sources/INDEX.md)         |
 | EDA              | Exploratory analysis, comparisons, correlations, and time-series views | [`eda/INDEX.md`](eda/INDEX.md)                           |
 | Field Management | Boundaries, field sampling, and headlands workflows                    | [`field-management/INDEX.md`](field-management/INDEX.md) |
 | Imagery          | Landsat and Sentinel-2 workflows for vegetation and scene analysis     | [`imagery/INDEX.md`](imagery/INDEX.md)                   |
@@ -301,7 +301,7 @@ This skill is the main farm-specific intelligence layer. The rest of the reposit
 
 - This skill suite ships large supporting examples and shared data assets.
 - The deterministic scripts and data-tree helpers are part of the skill, not just external repo utilities.
-- Canonical path helpers live in [`r2-seed-pipeline/src/scripts/lib/paths.py`](r2-seed-pipeline/src/scripts/lib/paths.py).
+- Canonical path helpers live in [`data-pipeline/src/scripts/lib/paths.py`](data-pipeline/src/scripts/lib/paths.py).
 - Some workflows assume pulled large files or generated artifacts are available locally.
 - The nested subtree documents are the real operating surface; this README is the map, not the full manual.
 

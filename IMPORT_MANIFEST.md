@@ -12,9 +12,9 @@ This manifest tracks planned and completed imports for `my-farm-advisor-skills`.
 - source_path: skills/my-farm-advisor/
 - destination_path: my-farm-advisor/
 - import_date: 2026-04-28
-- exclusions: `.git/`; `r2-seed-pipeline/src/shared/geoadmin/l0_countries/countries.geojson`; `r2-seed-pipeline/src/shared/geoadmin/l1_states/states_usa.geojson`; generated maturity report/table artifacts under `r2-seed-pipeline/src/shared/*/{reports,tables}/`; any repo-local CI or deployment files outside `skills/my-farm-advisor/`
+- exclusions: `.git/`; `data-pipeline/src/shared/geoadmin/l0_countries/countries.geojson`; `data-pipeline/src/shared/geoadmin/l1_states/states_usa.geojson`; generated maturity report/table artifacts under `data-pipeline/src/shared/*/{reports,tables}/`; any repo-local CI or deployment files outside `skills/my-farm-advisor/`
 - local_modifications: Imported `skills/my-farm-advisor/` into `my-farm-advisor/` and intentionally omitted the two generated geoadmin GeoJSON payloads plus generated maturity report/table artifacts while preserving metadata JSON files plus `download_geoadmin.py`, `farm_dashboard.py`, `run_farm_pipeline.py`, and `run_maturity_by_fips.py`.
-- update_procedure: Run `git ls-remote https://github.com/borealBytes/my-farm-advisor.git refs/heads/main`, confirm the SHA, clone or fetch the repo, copy only `skills/my-farm-advisor/` into `my-farm-advisor/`, exclude `r2-seed-pipeline/src/shared/geoadmin/l0_countries/countries.geojson`, `r2-seed-pipeline/src/shared/geoadmin/l1_states/states_usa.geojson`, and generated maturity report/table artifacts under `r2-seed-pipeline/src/shared/*/{reports,tables}/`, rerun `./scripts/validate.sh`, and refresh the QA evidence plus provenance fields in the same commit.
+- update_procedure: Run `git ls-remote https://github.com/borealBytes/my-farm-advisor.git refs/heads/main`, confirm the SHA, clone or fetch the repo, copy only `skills/my-farm-advisor/` into `my-farm-advisor/`, exclude `data-pipeline/src/shared/geoadmin/l0_countries/countries.geojson`, `data-pipeline/src/shared/geoadmin/l1_states/states_usa.geojson`, and generated maturity report/table artifacts under `data-pipeline/src/shared/*/{reports,tables}/`, rerun `./scripts/validate.sh`, and refresh the QA evidence plus provenance fields in the same commit.
 
 ## my-farm-breeding-trial-management
 

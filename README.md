@@ -108,7 +108,7 @@ This repository keeps asset hygiene strict. The following policy applies to larg
 - **Large GeoJSON payloads are runtime-downloaded, not committed.** The generated `countries.geojson`, `states_usa.geojson`, and county-level GeoJSON outputs are produced at runtime by the downloader scripts and land under `data/my-farm-advisor/shared/geoadmin/`, which is excluded from version control.
 - No generated output directories (`data/`, `.cache/`, build artifacts) are tracked.
 
-For details on running the geoadmin downloader, see `my-farm-advisor/r2-seed-pipeline/src/scripts/ingest/download_geoadmin.py` after the skill is imported.
+For details on running the geoadmin downloader, see `my-farm-advisor/data-pipeline/src/scripts/ingest/download_geoadmin.py` after the skill is imported.
 
 ---
 

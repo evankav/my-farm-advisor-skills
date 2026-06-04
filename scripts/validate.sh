@@ -337,12 +337,12 @@ done
 check_text_absent 'my-farm-qtl-analysis' 'scientific-skills/qtl-analysis/' 'Stale scientific-skills/qtl-analysis/ reference'
 
 geoadmin_root=''
-if [[ -d 'my-farm-advisor/r2-seed-pipeline/src/shared/geoadmin' ]]; then
-  geoadmin_root='my-farm-advisor/r2-seed-pipeline/src/shared/geoadmin'
+if [[ -d 'my-farm-advisor/data-pipeline/src/shared/geoadmin' ]]; then
+  geoadmin_root='my-farm-advisor/data-pipeline/src/shared/geoadmin'
 elif [[ -d 'my-farm-advisor/shared/geoadmin' ]]; then
   geoadmin_root='my-farm-advisor/shared/geoadmin'
-elif [[ -d 'my-farm-advisor/r2-seed-pipeline/src/data/geoadmin' ]]; then
-  geoadmin_root='my-farm-advisor/r2-seed-pipeline/src/data/geoadmin'
+elif [[ -d 'my-farm-advisor/data-pipeline/src/data/geoadmin' ]]; then
+  geoadmin_root='my-farm-advisor/data-pipeline/src/data/geoadmin'
 elif [[ -d 'shared/geoadmin' ]]; then
   geoadmin_root='shared/geoadmin'
 elif [[ -d 'geoadmin' ]]; then

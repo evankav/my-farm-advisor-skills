@@ -10,7 +10,7 @@ The geoadmin GeoJSON and Parquet payloads are **runtime data**, not repository c
 
 ## Metadata files and what they do
 
-The committed metadata lives under `my-farm-advisor/r2-seed-pipeline/src/shared/geoadmin/`:
+The committed metadata lives under `my-farm-advisor/data-pipeline/src/shared/geoadmin/`:
 
 - `l0_countries/metadata.json` — Natural Earth countries source URL, archive name, and expected runtime output paths.
 - `l1_states/metadata.json` — Census TIGER/Line states source URL, archive name, and expected runtime output paths.
@@ -49,11 +49,11 @@ Expected outputs are:
 
 ## How to run the downloader
 
-From `my-farm-advisor/r2-seed-pipeline/`:
+From `my-farm-advisor/data-pipeline/`:
 
 ```bash
 ./scripts/install.sh
-source /data/workspace/data/my-farm-advisor/r2-seed-pipeline/.venv/bin/activate
+source /data/workspace/data/my-farm-advisor/data-pipeline/.venv/bin/activate
 python src/scripts/ingest/download_geoadmin.py --levels l0_countries l1_states l2_counties --census-year 2025
 ```
 
