@@ -15,6 +15,9 @@ rasterstats>=0.19
 
 # Storage / interchange
 pyarrow>=15
+xarray>=2024.3
+zarr<3
+fsspec[http]>=2024.3
 
 # Plotting / reporting
 matplotlib>=3.8

@@ -34,6 +34,20 @@ The installer creates and refreshes the runtime tree under:
 
 Generated outputs, manifests, reports, logs, and downloaded payloads belong under the runtime base, for example `${DATA_PIPELINE_DATA_ROOT}/data-pipeline/growers` and `${DATA_PIPELINE_DATA_ROOT}/data-pipeline/shared`. The committed checkout remains the source for installer scripts and baseline `src/` files, but runtime execution happens from the copied source.
 
+Shared county weather for maturity-by-FIPS uses NASA POWER's public S3 Zarr stores by default instead of issuing one `power.larc.nasa.gov` point API request per county grid cell. This avoids API rate-limit failures for L2 geoadmin scopes while preserving the existing output path and schema:
+
+```text
+${DATA_PIPELINE_DATA_ROOT}/data-pipeline/shared/weather/nasa-power/<year>/daily_weather_by_fips.parquet
+```
+
+The default backend is equivalent to:
+
+```bash
+python scripts/run_maturity_by_fips.py --year 2025 --weather-backend zarr --weather-time-standard lst
+```
+
+Use `--weather-backend api` only when explicitly debugging the legacy NASA POWER point API path.
+
 To persist the default data root for future login sessions, write the user environment file and still export the variable in the current shell before running commands:
 
 ```bash

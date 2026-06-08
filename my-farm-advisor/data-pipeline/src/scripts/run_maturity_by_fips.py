@@ -29,6 +29,18 @@ def parse_args() -> argparse.Namespace:
         help="Canonical shared weather source slug for annual maturity outputs",
     )
     parser.add_argument(
+        "--weather-backend",
+        choices=["zarr", "api"],
+        default="zarr",
+        help="County weather backend for shared scopes; zarr avoids POWER point API rate limits",
+    )
+    parser.add_argument(
+        "--weather-time-standard",
+        choices=["lst", "utc"],
+        default="lst",
+        help="NASA POWER time standard for Zarr/API county weather outputs",
+    )
+    parser.add_argument(
         "--list-steps",
         action="store_true",
         help="Print the planned annual maturity output roots and exit",
@@ -48,13 +60,13 @@ def parse_args() -> argparse.Namespace:
         "--weather-workers",
         type=int,
         default=5,
-        help="Concurrent NASA POWER grid requests for county weather",
+        help="Concurrent NASA POWER API grid requests when --weather-backend api",
     )
     parser.add_argument(
         "--weather-request-delay",
         type=float,
         default=0.5,
-        help="Delay in seconds after each NASA POWER county-weather request",
+        help="Delay in seconds after each NASA POWER API county-weather request",
     )
     parser.add_argument(
         "--grower-slug",
@@ -132,6 +144,8 @@ def main() -> int:
         {
             "year": args.year,
             "weather_source": args.weather_source,
+            "weather_backend": args.weather_backend,
+            "weather_time_standard": args.weather_time_standard,
             "coverage": args.coverage,
             "updated_at": _iso_now(),
             "steps": manifest.get("steps", {}),
@@ -145,6 +159,10 @@ def main() -> int:
         str(args.year),
         "--weather-source",
         args.weather_source,
+        "--weather-backend",
+        args.weather_backend,
+        "--time-standard",
+        args.weather_time_standard,
         "--coverage",
         args.coverage,
         "--workers",
