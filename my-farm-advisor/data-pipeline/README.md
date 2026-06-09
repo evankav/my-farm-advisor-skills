@@ -24,6 +24,34 @@ cd "${DATA_PIPELINE_DATA_ROOT}/data-pipeline/src"
   --force
 ```
 
+For a first run that also initializes shared data and seeds fields for a grower in a state, use the installer directly from the checkout:
+
+```bash
+export DATA_PIPELINE_DATA_ROOT=/absolute/path/to/my-farm-advisor-runtime
+cd my-farm-advisor/data-pipeline
+./scripts/install.sh \
+  --prepare-shared-data \
+  --seed-grower-slug acme-grower \
+  --seed-state Illinois \
+  --seed-field-count 12 \
+  --seed-farm-name "Acme Illinois Farm"
+```
+
+That command installs the runtime source and venv, builds shared geoadmin L0/L1/L2 payloads, shared NASA POWER county weather, GDD, annual corn RM, annual soybean MG, five-year FIPS-average corn RM and soybean MG datasets, and last-five-year CONUS CDL rasters. It then selects a top-crop county in the requested state, samples the requested number of OSM fields, and runs the full farm pipeline so derived tables, field weather, soil outputs, CDL history, satellite/NDVI products, reports, cards, posters, and HTML/Markdown farm reports are generated automatically.
+
+If the runtime is already installed, run the equivalent from the runtime source copy:
+
+```bash
+cd "${DATA_PIPELINE_DATA_ROOT}/data-pipeline/src"
+"${DATA_PIPELINE_DATA_ROOT}/data-pipeline/.venv/bin/python" \
+  scripts/farm_dashboard.py create \
+  --prepare-shared-data \
+  --grower-slug acme-grower \
+  --state Illinois \
+  --field-count 12 \
+  --farm-name "Acme Illinois Farm"
+```
+
 `DATA_PIPELINE_DATA_ROOT` is required. Set it to an absolute writable path outside the skill checkout before running the installer or any pipeline entrypoint. There is no implicit fallback to a platform workspace path or to a checkout-local `data/` directory.
 
 The installer creates and refreshes the runtime tree under:
@@ -65,12 +93,12 @@ Shared county weather for maturity-by-FIPS uses NASA POWER's public S3 Zarr stor
 ${DATA_PIPELINE_DATA_ROOT}/data-pipeline/shared/weather/nasa-power/<year>/daily_weather_by_fips.parquet
 ```
 
-For the full shared lower48 maturity baseline, initialize the runtime with multi-year county weather, GDD, corn RM, and soybean MG outputs. The default shared maturity range is 2021-2025 to match the farm weather and CDL helper defaults:
+For the full shared lower48 baseline, initialize the runtime with multi-year county weather, GDD, corn RM, soybean MG, corn/soybean five-year FIPS averages, and CDL raster outputs. The default shared maturity range is 2021-2025 to match the farm weather and CDL helper defaults; CDL initialization fetches the last five available CONUS rasters by default:
 
 ```bash
 export DATA_PIPELINE_DATA_ROOT=/absolute/path/to/my-farm-advisor-runtime
 cd my-farm-advisor/data-pipeline
-./scripts/install.sh --prepare-shared-maturity
+./scripts/install.sh --prepare-shared-data
 ```
 
 That install flag runs the equivalent of:
@@ -82,7 +110,16 @@ python scripts/run_maturity_years_by_fips.py \
   --coverage lower48 \
   --weather-backend zarr \
   --weather-time-standard lst
+python scripts/ingest/download_cdl.py \
+  --raster-only \
+  --cdl-scope conus \
+  --cdl-latest-year 2025 \
+  --cdl-window-years 5
 ```
+
+`--prepare-shared-maturity` remains available for weather/GDD/corn/soy maturity only, but it does not prepare CDL rasters.
+
+The maturity runner writes annual files like `shared/corn_maturity/tables/rm_by_fips_2025.parquet` and final five-year average files like `shared/corn_maturity/tables/rm_by_fips_2021_2025_average.parquet` and `shared/soybean_maturity/tables/mg_by_fips_2021_2025_average.parquet`.
 
 For a single annual refresh, run:
 

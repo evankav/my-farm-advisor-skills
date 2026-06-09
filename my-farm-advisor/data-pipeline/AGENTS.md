@@ -33,6 +33,21 @@ cd my-farm-advisor/data-pipeline
 ./scripts/install.sh
 ```
 
+First-time install plus shared-data initialization and state-based field seeding:
+
+```bash
+export DATA_PIPELINE_DATA_ROOT=/absolute/path/to/my-farm-advisor-runtime
+cd my-farm-advisor/data-pipeline
+./scripts/install.sh \
+  --prepare-shared-data \
+  --seed-grower-slug acme-grower \
+  --seed-state Illinois \
+  --seed-field-count 12 \
+  --seed-farm-name "Acme Illinois Farm"
+```
+
+Use this pattern when the user asks to initialize the data-pipeline and seed X fields for a grower in a specified state. The seeded farm slug and farm name can be omitted; `farm_dashboard.py create` derives stable defaults from grower and state. Because this path runs the full farm pipeline after seeding boundaries, derived tables, field weather, soil outputs, CDL history, satellite/NDVI products, reports, cards, posters, and HTML/Markdown farm reports should generate automatically.
+
 Current-shell export for an existing runtime:
 
 ```bash
@@ -79,6 +94,33 @@ cd "${DATA_PIPELINE_DATA_ROOT}/data-pipeline/src"
   --weather-start-year 2021 \
   --weather-end-year 2025 \
   --weather-time-standard lst
+```
+
+Initialize shared geoadmin, maturity, weather, and CDL assets without seeding a farm:
+
+```bash
+export DATA_PIPELINE_DATA_ROOT=/absolute/path/to/my-farm-advisor-runtime
+cd my-farm-advisor/data-pipeline
+./scripts/install.sh --prepare-shared-data
+```
+
+The shared maturity initializer writes annual corn RM and soybean MG outputs plus final last-five-year FIPS-average datasets such as `shared/corn_maturity/tables/rm_by_fips_2021_2025_average.parquet` and `shared/soybean_maturity/tables/mg_by_fips_2021_2025_average.parquet`.
+
+Runtime equivalent after install:
+
+```bash
+export DATA_PIPELINE_DATA_ROOT=/absolute/path/to/my-farm-advisor-runtime
+cd "${DATA_PIPELINE_DATA_ROOT}/data-pipeline/src"
+"${DATA_PIPELINE_DATA_ROOT}/data-pipeline/.venv/bin/python" \
+  scripts/init_shared_data.py \
+  --start-year 2021 \
+  --end-year 2025 \
+  --coverage lower48 \
+  --weather-backend zarr \
+  --weather-time-standard lst \
+  --cdl-scope conus \
+  --cdl-latest-year 2025 \
+  --cdl-window-years 5
 ```
 
 Use the legacy NASA POWER point API only for small debugging pulls:
