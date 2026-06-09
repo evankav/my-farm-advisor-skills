@@ -28,6 +28,7 @@ from lib.satellite_imagery import (  # noqa: E402
     feature_datetime,
     growing_season_range,
     landsat_asset_keys,
+    SatelliteSearchError,
     search_features,
     sentinel_asset_keys,
     sign_planetary_computer_href,
@@ -364,13 +365,29 @@ def _download_sensor_archive(
                 )
                 continue
 
-        features = search_features(
-            collection,
-            tuple(field_geom.bounds),
-            growing_season_range(year),
-            cloud_cover_max,
-            limit=max(60, max_scenes_per_year * 8),
-        )
+        try:
+            features = search_features(
+                collection,
+                tuple(field_geom.bounds),
+                growing_season_range(year),
+                cloud_cover_max,
+                limit=max(60, max_scenes_per_year * 8),
+            )
+        except SatelliteSearchError as exc:
+            year_entries.append(
+                {
+                    "year": year,
+                    "status": "missing",
+                    "reason": "search_failed",
+                    "error": str(exc),
+                    "scene_count": 0,
+                    "scenes": [],
+                    "coverage_months": [],
+                    "missing_months": list(_GROWING_SEASON_MONTHS),
+                }
+            )
+            print(f"warn  {field_id} {sensor} {year} search failed: {exc}")
+            continue
         selected_features = _select_scene_inventory(
             features, max_scenes_per_year=max_scenes_per_year
         )

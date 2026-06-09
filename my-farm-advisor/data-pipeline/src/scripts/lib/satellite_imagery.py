@@ -18,7 +18,12 @@ SENTINEL_COLLECTION = "sentinel-2-l2a"
 LANDSAT_COLLECTION = "landsat-c2-l2"
 SENTINEL_CLOUD_CLASSES = {3, 8, 9, 10, 11}
 LANDSAT_QA_MASK_BITS = (1, 2, 3, 4, 5)
+TRANSIENT_SEARCH_STATUS_CODES = {429, 500, 502, 503, 504}
 _TOKEN_CACHE: dict[str, tuple[str, float]] = {}
+
+
+class SatelliteSearchError(RuntimeError):
+    """Raised when the STAC search endpoint remains unavailable after retries."""
 
 
 def growing_season_range(year: int) -> str:
@@ -61,6 +66,7 @@ def search_features(
     cloud_lt: float,
     *,
     limit: int = 100,
+    attempts: int = 3,
 ) -> list[dict[str, Any]]:
     query: dict[str, Any] = {"eo:cloud_cover": {"lt": cloud_lt}}
     if collection == LANDSAT_COLLECTION:
@@ -73,8 +79,27 @@ def search_features(
         "limit": limit,
         "query": query,
     }
-    response = requests.post(PLANETARY_COMPUTER_SEARCH_URL, json=body, timeout=60)
-    response.raise_for_status()
+    last_error: Exception | None = None
+    for attempt in range(attempts):
+        try:
+            response = requests.post(PLANETARY_COMPUTER_SEARCH_URL, json=body, timeout=60)
+            response.raise_for_status()
+            break
+        except requests.RequestException as exc:
+            last_error = exc
+            response = getattr(exc, "response", None)
+            if response is not None and response.status_code not in TRANSIENT_SEARCH_STATUS_CODES:
+                raise
+            if attempt + 1 >= attempts:
+                raise SatelliteSearchError(
+                    f"Planetary Computer STAC search failed after {attempts} attempts "
+                    f"for {collection} {datetime_range}"
+                ) from exc
+            time.sleep(min(2**attempt, 20))
+    else:
+        raise SatelliteSearchError(
+            f"Planetary Computer STAC search failed for {collection} {datetime_range}"
+        ) from last_error
     features = response.json().get("features", [])
     return sorted(
         features,
