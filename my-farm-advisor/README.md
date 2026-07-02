@@ -271,6 +271,11 @@ Examples:
 - "Generate field boundaries or map views" -> [`field-management/field-boundaries/GUIDE.md`](field-management/field-boundaries/GUIDE.md)
 - "Check weather and maturity planning" -> [`weather/INDEX.md`](weather/INDEX.md) and [`strategy/INDEX.md`](strategy/INDEX.md)
 - "Prepare a farm intelligence report" -> [`data-sources/farm-intelligence-reporting/AGENTS.md`](data-sources/farm-intelligence-reporting/AGENTS.md)
+- "Run the Assignment 2 field-level EDA" -> [`eda/eda-assignment-2/GUIDE.md`](eda/eda-assignment-2/GUIDE.md)
+
+## Assignment 2 EDA Subskill
+
+The [`eda/eda-assignment-2/`](eda/eda-assignment-2/) subskill provides a reusable multi-grower EDA workflow that compares field boundaries, CDL crop data, and NASA POWER weather across three Corn Belt growers (Illinois, Iowa, Nebraska). It generates 10 static PNG figures (field-size distribution, compactness, size-vs-latitude, crop composition, purity, rotation heatmap, monthly temperature, precipitation, climate space, and a geospatial field-location map). Outputs and the Assignment 2 Word report are saved under `${DATA_PIPELINE_DATA_ROOT}/data-pipeline/eda/eda-assignment-2/output/`.
 
 ## Why It Matters In This Repo
 
