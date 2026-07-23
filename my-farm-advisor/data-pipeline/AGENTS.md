@@ -151,7 +151,30 @@ cd ../..
 ./scripts/validate.sh
 ```
 
-## Local workflow notes
+Generate an offline weather dashboard for a farm that already has pipeline outputs:
+
+```bash
+export DATA_PIPELINE_DATA_ROOT=/absolute/path/to/my-farm-advisor-runtime
+cd "${DATA_PIPELINE_DATA_ROOT}/data-pipeline/src"
+"${DATA_PIPELINE_DATA_ROOT}/data-pipeline/.venv/bin/python" \
+  scripts/reporting/generate_weather_dashboard.py \
+  --farm-dir ~/my-farm-advisor-runtime/data-pipeline/growers/<grower>/farms/<farm>
+```
+
+Run the full pipeline including an offline weather dashboard as a final opt-in stage:
+
+```bash
+export DATA_PIPELINE_DATA_ROOT=/absolute/path/to/my-farm-advisor-runtime
+cd "${DATA_PIPELINE_DATA_ROOT}/data-pipeline/src"
+"${DATA_PIPELINE_DATA_ROOT}/data-pipeline/.venv/bin/python" \
+  scripts/run_farm_pipeline.py \
+  --grower-slug <grower> \
+  --farm-slug <farm> \
+  --farm-name "<Farm Name>" \
+  --generate-dashboard
+```
+
+### Local workflow notes
 
 - Keep this skill tiny and operational: copy baseline files from `src/` into live storage, preserve live data across reboot or redeploy, and use auditable `rsync` commands.
 - Live data wins unless the user explicitly runs an upgrade or `--force-refresh` workflow.

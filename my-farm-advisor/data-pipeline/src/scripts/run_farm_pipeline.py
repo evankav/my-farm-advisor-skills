@@ -208,6 +208,21 @@ def main() -> None:
         action="store_true",
         help="Create and verify canonical data tree, then exit",
     )
+    parser.add_argument(
+        "--generate-dashboard",
+        action="store_true",
+        help="Generate an offline weather dashboard as a final opt-in stage",
+    )
+    parser.add_argument(
+        "--no-dashboard-basemap",
+        action="store_true",
+        help="Skip satellite basemap acquisition when generating the weather dashboard",
+    )
+    parser.add_argument(
+        "--dashboard-output",
+        default=None,
+        help="Explicit output path for the weather dashboard HTML",
+    )
     args = parser.parse_args()
     if args.weather_start_year > args.weather_end_year:
         print("ERROR: --weather-start-year must be <= --weather-end-year")
@@ -337,6 +352,29 @@ def main() -> None:
             output = farm_report_asset_path(args.grower_slug, args.farm_slug, extension)
             if output.exists():
                 print(f"    {_runtime_relative(output)}")
+    if all_ok and args.generate_dashboard:
+        dashboard_script = "reporting/generate_weather_dashboard.py"
+        _update_grower_manifest(
+            grower_manifest,
+            farm_slug=args.farm_slug,
+            run_status="running",
+            active_step=dashboard_script,
+            step_results=step_results,
+        )
+        print("\n[Weather Dashboard]")
+        farm_dir_parent = farm_boundary_path(args.grower_slug, args.farm_slug).parent
+        dashboard_env = {**extra_env}
+        dashboard_env["AG_DASHBOARD_FARM_DIR"] = str(farm_dir_parent)
+        if args.no_dashboard_basemap:
+            dashboard_env["AG_NO_BASEMAP"] = "1"
+        if args.dashboard_output:
+            dashboard_env["AG_DASHBOARD_OUTPUT"] = args.dashboard_output
+        ok_dash = _run(dashboard_script, extra_env=dashboard_env)
+        step_results.append(
+            {"step": dashboard_script, "status": "ok" if ok_dash else "failed"}
+        )
+        if not ok_dash:
+            all_ok = False
     print("=" * 60)
     print()
 
