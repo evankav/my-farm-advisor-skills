@@ -23,6 +23,7 @@ fsspec[http]>=2024.3
 matplotlib>=3.8
 seaborn>=0.13
 contextily>=1.6
+plotly>=5.18
 
 # Dashboard assets
 Pillow>=10.0
